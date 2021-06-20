@@ -2,6 +2,7 @@
 A easy NPC-API which create npc's on your Server.
 
 ##How to use
+
 Add the repository and dependency to your plugin:
 
 **Coming soon :)**
