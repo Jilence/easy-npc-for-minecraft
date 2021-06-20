@@ -1,7 +1,7 @@
 # Easy NPC's for your Server
 A easy NPC-API which create npc's on your Minecraft Server.
 
-#How to use
+# How to use
 
 Add the repository and dependency to your plugin:
 
@@ -13,7 +13,7 @@ Add [ProtocolLib](https://github.com/dmulloy2/ProtocolLib) as a depend/softdepen
 depend: [ProtocoLib] 
 ```
 
-#Example usage
+# Example usage
 
 **Coming soon :)**
 
