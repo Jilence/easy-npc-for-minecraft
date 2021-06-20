@@ -1,0 +1,9 @@
+name: NPC
+version: ${project.version}
+main: de.jilence.easynpc.test.Main
+api-version: 1.16
+
+depend: [ProtocolLib]
+
+commands:
+  npc:
