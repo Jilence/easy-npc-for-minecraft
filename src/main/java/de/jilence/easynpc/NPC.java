@@ -1,6 +1,11 @@
 package de.jilence.easynpc;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
 import com.mojang.authlib.GameProfile;
+import de.jilence.easynpc.event.PlayerNPCHideEvent;
+import de.jilence.easynpc.event.PlayerNPCInteractEvent;
 import de.jilence.easynpc.modification.RotationModifier;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
@@ -9,7 +14,10 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -59,8 +67,8 @@ public class NPC {
     /**
      * create a npc
      *
-     * @param location were the npc is
-     * @param name name of the npc
+     * @param location           were the npc is
+     * @param name               name of the npc
      * @param shouldLookAtPlayer a bool if the npc looking to the player
      */
     public NPC(Location location, String name, Boolean shouldLookAtPlayer) {
@@ -71,7 +79,7 @@ public class NPC {
     }
 
     /**
-     * spawning and creating the armor stand with the informations
+     * spawning and creating the armor stand with the information
      *
      * @return a npc
      */
@@ -84,13 +92,74 @@ public class NPC {
         npc.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
         npc.getDataWatcher().set(DataWatcherRegistry.a.a(16), (byte) 127);
 
-        for(Player player : Bukkit.getOnlinePlayers()) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
             PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
             playerConnection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, npc));
             playerConnection.sendPacket(new PacketPlayOutNamedEntitySpawn(npc));
             playerConnection.sendPacket(new PacketPlayOutEntityMetadata(npc.getId(), npc.getDataWatcher(), true));
         }
         return this;
+    }
+
+    /**
+     * hide a npc for a specific player
+     *
+     * @param player the player for which the npc made invisible
+     * @param plugin the plugin
+     * @param reason the reason why the npc is hiding
+     */
+    public void hide(@NotNull Player player, @NotNull Plugin plugin, @NotNull PlayerNPCHideEvent.Reason reason) {
+        PacketContainer packetContainer = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
+        packetContainer.getIntegerArrays().write(0, new int[]{this.getEntityId()});
+        try {
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, packetContainer);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        Bukkit.getPluginManager().callEvent(
+                new PlayerNPCHideEvent(player, reason, false)
+        );
+    }
+
+    /**
+     * hide a npc for all people
+     *
+     * @param plugin the plugin
+     * @param reason the reason why the npc is hiding
+     */
+    public void hide(@NotNull Plugin plugin, @NotNull PlayerNPCHideEvent.Reason reason) {
+        PacketContainer packetContainer = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
+        packetContainer.getIntegerArrays().write(0, new int[]{this.getEntityId()});
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            try {
+                ProtocolLibrary.getProtocolManager().sendServerPacket(player, packetContainer);
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        });
+        Bukkit.getPluginManager().callEvent(
+                new PlayerNPCHideEvent(null, reason, true)
+        );
+    }
+
+    /**
+     * show a npc for a specific player
+     *
+     * @param player the player for which the npc made invisible
+     * @param plugin the plugin
+     * @param reason the reason why the npc is showing
+     */
+    public void show(@NotNull Player player, @NotNull Plugin plugin, @NotNull PlayerNPCHideEvent.Reason reason) {
+        PacketContainer packetContainer = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
+        packetContainer.getIntegerArrays().write(0, new int[]{this.getEntityId()});
+        try {
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, packetContainer);
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        Bukkit.getPluginManager().callEvent(
+                new PlayerNPCHideEvent(player, reason, false)
+        );
     }
 
     /**

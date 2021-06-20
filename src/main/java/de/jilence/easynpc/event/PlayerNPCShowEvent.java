@@ -4,20 +4,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class PlayerNPCHideEvent extends PlayerEvent {
+public class PlayerNPCShowEvent extends PlayerEvent {
 
     /**
      * the handler list
-     * @see PlayerNPCHideEvent#getHandlerList()
+     * @see PlayerNPCShowEvent#getHandlers() ()
      */
     private static final HandlerList HANDLER_LIST = new HandlerList();
 
     /**
      * the reason why the npc is hiding
      */
-    private final Reason reason;
+    private final PlayerNPCShowEvent.Reason reason;
 
     /**
      * a bool if the npc is made for all players invisible
@@ -25,23 +24,27 @@ public class PlayerNPCHideEvent extends PlayerEvent {
     private final Boolean allPlayer;
 
     /**
-     * a custom event which triggered when a npc get invisible
+     * triggered when a npc is showing for a player
      *
-     * @param player which player don't see the npc anymore
-     * @param reason why the npc is hiding
+     * @param player for which player the npc was made showing
      */
-    public PlayerNPCHideEvent(@Nullable Player player, Reason reason, Boolean allPlayer) {
+    public PlayerNPCShowEvent(Player player, PlayerNPCShowEvent.Reason reason, Boolean allPlayer) {
         super(player);
-        this.reason = reason;
         this.allPlayer = allPlayer;
+        this.reason = reason;
     }
 
     /**
-     *
-     * @return a bool if the npc for all players were made invisible
-     * return true if for all, false otherwise
+     * @return why the npc is showing
      */
-    public Boolean getIfAllPlayer() {
+    public Reason getReason() {
+        return reason;
+    }
+
+    /**
+     * @return if the npc is showing for all people
+     */
+    public Boolean getAllPlayer() {
         return allPlayer;
     }
 
@@ -65,30 +68,23 @@ public class PlayerNPCHideEvent extends PlayerEvent {
         return HANDLER_LIST;
     }
 
-    /**
-     * @return the reason why the npc was hiding
-     */
-    public Reason getReason() {
-        return reason;
-    }
-
     public enum Reason {
         /**
-         * the npc was removed from the world
+         * the npc was spawning in the world
          */
-        REMOVED,
+        SPAWNING,
         /**
-         * the npc was removed because the distance to the player was to high
+         * the npc was showing because the distance to the player low
          */
         DISTANCE,
         /**
-         * the player were not allowed to see the npc
+         * show the player only for one player
          */
-        HIDING,
+        SHOWING,
         /**
-         * hiding the npc for all people
+         * show the npc for all people
          */
-        HIDING_FOR_ALL;
+        SHOWING_FOR_ALL;
     }
 
 }
