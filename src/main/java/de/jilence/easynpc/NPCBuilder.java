@@ -53,7 +53,7 @@ public class NPCBuilder {
      */
     public NPCBuilder setName(String name) {
         if(name.length() > 16) try {
-            throw new Exception("name cannot be longer then 16 characters");
+            throw new IllegalArgumentException("name cannot be longer then 16 characters");
         } catch (Exception e) {
             e.printStackTrace();
         }
