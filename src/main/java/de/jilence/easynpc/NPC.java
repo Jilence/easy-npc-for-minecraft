@@ -6,6 +6,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.mojang.authlib.GameProfile;
 import de.jilence.easynpc.event.PlayerNPCHideEvent;
 import de.jilence.easynpc.event.PlayerNPCInteractEvent;
+import de.jilence.easynpc.event.PlayerNPCShowEvent;
 import de.jilence.easynpc.modification.RotationModifier;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
@@ -45,6 +46,11 @@ public class NPC {
     private final Location location;
 
     /**
+     * the name from the npc
+     */
+    private final String name;
+
+    /**
      * a bool if the npc should look to the player
      */
     private final Boolean shouldLookAtPlayer;
@@ -73,6 +79,7 @@ public class NPC {
      */
     public NPC(Location location, String name, Boolean shouldLookAtPlayer) {
         this.location = location;
+        this.name = name;
         this.shouldLookAtPlayer = shouldLookAtPlayer;
         this.worldServer = ((CraftWorld) location.getWorld()).getHandle();
         this.gameProfile = new GameProfile(UUID.fromString("f93f7b0e-7c90-4954-937e-6c30ef1dd0bc"), name);
@@ -143,22 +150,18 @@ public class NPC {
     }
 
     /**
-     * show a npc for a specific player
+     * show a npc for all players
      *
-     * @param player the player for which the npc made invisible
      * @param plugin the plugin
      * @param reason the reason why the npc is showing
      */
-    public void show(@NotNull Player player, @NotNull Plugin plugin, @NotNull PlayerNPCHideEvent.Reason reason) {
-        PacketContainer packetContainer = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
-        packetContainer.getIntegerArrays().write(0, new int[]{this.getEntityId()});
-        try {
-            ProtocolLibrary.getProtocolManager().sendServerPacket(player, packetContainer);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+    public void show(@NotNull Plugin plugin, @NotNull PlayerNPCShowEvent.Reason reason) {
+        new NPCBuilder(plugin)
+                .lookingAtPlayer(this.isShouldLookAtPlayer())
+                .setName(this.getName())
+                .setLocation(this.getLocation()).spawn();
         Bukkit.getPluginManager().callEvent(
-                new PlayerNPCHideEvent(player, reason, false)
+                new PlayerNPCShowEvent(null, reason, false)
         );
     }
 
@@ -200,6 +203,13 @@ public class NPC {
     }
 
     /**
+     * @return the name of the npc
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
      * @return the world server were the npc is
      */
     public WorldServer getWorldServer() {
@@ -219,4 +229,6 @@ public class NPC {
     public Location getLocation() {
         return this.location;
     }
+
+
 }
