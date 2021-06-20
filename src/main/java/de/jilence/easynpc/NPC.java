@@ -7,6 +7,7 @@ import com.mojang.authlib.GameProfile;
 import de.jilence.easynpc.event.PlayerNPCHideEvent;
 import de.jilence.easynpc.event.PlayerNPCInteractEvent;
 import de.jilence.easynpc.event.PlayerNPCShowEvent;
+import de.jilence.easynpc.modification.AnimationModifier;
 import de.jilence.easynpc.modification.RotationModifier;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
@@ -77,12 +78,12 @@ public class NPC {
      * @param name               name of the npc
      * @param shouldLookAtPlayer a bool if the npc looking to the player
      */
-    public NPC(Location location, String name, Boolean shouldLookAtPlayer) {
+    public NPC(Location location, String name, Boolean shouldLookAtPlayer, GameProfile gameProfile) {
         this.location = location;
         this.name = name;
         this.shouldLookAtPlayer = shouldLookAtPlayer;
         this.worldServer = ((CraftWorld) location.getWorld()).getHandle();
-        this.gameProfile = new GameProfile(UUID.fromString("f93f7b0e-7c90-4954-937e-6c30ef1dd0bc"), name);
+        this.gameProfile = gameProfile;
     }
 
     /**
@@ -155,6 +156,7 @@ public class NPC {
      * @param plugin the plugin
      * @param reason the reason why the npc is showing
      */
+    @Deprecated
     public void show(@NotNull Plugin plugin, @NotNull PlayerNPCShowEvent.Reason reason) {
         new NPCBuilder(plugin)
                 .lookingAtPlayer(this.isShouldLookAtPlayer())
@@ -179,6 +181,10 @@ public class NPC {
      */
     public RotationModifier getRotationModifier() {
         return new RotationModifier(this);
+    }
+
+    public AnimationModifier getAnimationModifier() {
+        return new AnimationModifier(this);
     }
 
     /**

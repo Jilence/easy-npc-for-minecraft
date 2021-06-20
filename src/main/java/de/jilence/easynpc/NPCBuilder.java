@@ -1,13 +1,13 @@
 package de.jilence.easynpc;
 
+import com.mojang.authlib.GameProfile;
 import de.jilence.easynpc.event.NPCEventManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.UUID;
 
 public class NPCBuilder {
 
@@ -26,6 +26,8 @@ public class NPCBuilder {
      * the plugin
      */
     private final Plugin plugin;
+
+    private String skinId;
 
     /**
      * a bool if the scheduler is running
@@ -78,13 +80,24 @@ public class NPCBuilder {
     }
 
     /**
+     * set the skin from the npc
+     *
+     * @param uuid of the skin
+     * @return the builder
+     */
+    public NPCBuilder setSkin(String uuid) {
+        this.skinId = uuid;
+        return this;
+    }
+
+    /**
      *
      * spawning the npc
      *
      * @return a spawned npc
      */
     public NPC spawn() {
-        return new NPC(this.location, this.name, this.lookOnPlayer).spawn();
+        return new NPC(this.location, this.name, this.lookOnPlayer, new GameProfile(UUID.fromString(this.skinId), this.name)).spawn();
     }
 
     /**
