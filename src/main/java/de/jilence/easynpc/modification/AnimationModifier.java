@@ -3,18 +3,25 @@ package de.jilence.easynpc.modification;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.reflect.StructureModifier;
 import de.jilence.easynpc.NPC;
 import org.bukkit.Bukkit;
-import org.bukkit.event.player.PlayerAnimationType;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
 
 public class AnimationModifier {
 
+
+    /**
+     * the marked npc
+     */
     private final NPC npc;
 
+    /**
+     * animate a npc
+     *
+     * @param npc the npc which would be animated
+     */
     public AnimationModifier(@NotNull NPC npc) {
         this.npc = npc;
     }
